@@ -4,28 +4,52 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
-import DashboardScreen from './src/screens/DashboardScreen'; // ✅ importa el Dashboard
+import DashboardScreen from './src/screens/DashboardScreen';
+
+// importa las nuevas pantallas de Onboarding
+import OnboardingWelcome from './src/screens/Onboarding/OnboardingWelcome';
+console.log("OnboardingWelcome:", typeof OnboardingWelcome);
+import OnboardingBenefits from './src/screens/Onboarding/OnboardingBenefits';
+import OnboardingPermissions from './src/screens/Onboarding/OnboardingPermissions';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="OnboardingWelcome">
+        {/* Flujo de Onboarding */}
+        <Stack.Screen 
+          name="OnboardingWelcome" 
+          component={OnboardingWelcome} 
+          options={{ title: 'Bienvenida' }} 
+        />
+        <Stack.Screen 
+          name="OnboardingBenefits" 
+          component={OnboardingBenefits} 
+          options={{ title: 'Beneficios' }} 
+        />
+        <Stack.Screen 
+          name="OnboardingPermissions" 
+          component={OnboardingPermissions} 
+          options={{ title: 'Permisos' }} 
+        />
+
+        {/* Flujo de autenticación */}
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
-          options={{ title: 'Inicio de Sesión' }}
+          options={{ title: 'Inicio de Sesión' }} 
         />
         <Stack.Screen 
           name="Register" 
           component={RegisterScreen} 
-          options={{ title: 'Registro de Usuario' }}
+          options={{ title: 'Registro de Usuario' }} 
         />
         <Stack.Screen 
           name="Dashboard" 
           component={DashboardScreen} 
-          options={{ title: 'Panel Privado' }} // ✅ título para el dashboard
+          options={{ title: 'Panel Privado' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

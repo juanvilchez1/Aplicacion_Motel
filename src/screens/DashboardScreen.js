@@ -1,7 +1,7 @@
-// frontend/src/screens/DashboardScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { globalStyles } from '../styles';
 
 export default function DashboardScreen({ navigation }) {
   const [token, setToken] = useState('');
@@ -9,26 +9,33 @@ export default function DashboardScreen({ navigation }) {
   useEffect(() => {
     const getToken = async () => {
       const savedToken = await AsyncStorage.getItem('token');
-      setToken(savedToken || 'No hay token guardado');
+      setToken(savedToken || '');
     };
     getToken();
   }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('token'); // ✅ borrar token
-    navigation.navigate('Login');           // ✅ volver al login
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Login');
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 18, marginBottom: 10 }}>
-        Bienvenido al Dashboard
-      </Text>
-      <Text style={{ marginBottom: 20 }}>
-        Token guardado: {token}
-      </Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Bienvenido al Dashboard</Text>
 
-      <Button title="Cerrar sesión" onPress={handleLogout} />
+      {token ? (
+        <Text style={{ color: '#228B22', marginBottom: 20 }}>
+          ✅ Token guardado: {token}
+        </Text>
+      ) : (
+        <Text style={{ color: 'red', marginBottom: 20 }}>
+          ❌ No hay token guardado
+        </Text>
+      )}
+
+      <TouchableOpacity style={globalStyles.button} onPress={handleLogout}>
+        <Text style={globalStyles.buttonText}>Cerrar sesión</Text>
+      </TouchableOpacity>
     </View>
   );
 }

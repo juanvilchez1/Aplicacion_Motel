@@ -1,64 +1,138 @@
-// frontend/src/screens/RegisterScreen.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
-import { register } from '../services/authService';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, TextInput, Text, TouchableOpacity } from 'react-native';
+import { registerSchema } from '../validacion/esquema_registro';
+import { register, checkEmailExists } from '../services/authService';
+import { globalStyles } from '../styles';
+import debounce from 'lodash/debounce';
 
 export default function RegisterScreen({ navigation }) {
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [contraseña, setContraseña] = useState('');
-  const [rol_id, setRolId] = useState('1'); // por defecto admin
+  const [formData, setFormData] = useState({
+    nombre: '',
+    correo: '',
+    contraseña: '',
+    confirmPassword: '',
+    rol_id: '1', // ✅ rol fijo para registro
+  });
+  const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState('');
+
+  const nombreRef = useRef(null);
+  const correoRef = useRef(null);
+  const contraseñaRef = useRef(null);
+  const confirmRef = useRef(null);
+
+  const validateEmailAsync = useCallback(
+    debounce(async (email) => {
+      try {
+        const exists = await checkEmailExists(email);
+        if (exists) {
+          setErrors((prev) => ({
+            ...prev,
+            correo: "Este correo ya está registrado. Usa otro correo."
+          }));
+        }
+      } catch (err) {
+        console.log("Error validando correo:", err);
+      }
+    }, 500), []
+  );
+
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (field === "correo") {
+      validateEmailAsync(value);
+    }
+  };
 
   const handleRegister = async () => {
     try {
-      const data = await register(nombre, correo, contraseña, rol_id);
-      setMensaje(data.mensaje || "Usuario registrado correctamente");
+      // ahora valida también rol_id
+      registerSchema.parse(formData);
 
-      // ✅ después de registrar, puedes redirigir automáticamente a Login
-      // navigation.navigate('Login');
+      const data = await register(
+        formData.nombre,
+        formData.correo,
+        formData.contraseña,
+        formData.rol_id // se envía correctamente
+      );
+
+      setMensaje(data.mensaje || "✅ Usuario registrado correctamente");
     } catch (error) {
-      setMensaje(error.response?.data?.error || "Error al registrar usuario");
+      if (error.errors) {
+        const formattedErrors = error.errors.reduce((acc, err) => {
+          acc[err.path[0]] = err.message;
+          return acc;
+        }, {});
+        setErrors(formattedErrors);
+
+        if (formattedErrors.nombre) nombreRef.current.focus();
+        else if (formattedErrors.correo) correoRef.current.focus();
+        else if (formattedErrors.contraseña) contraseñaRef.current.focus();
+        else if (formattedErrors.confirmPassword) confirmRef.current.focus();
+        else if (formattedErrors.rol_id) setMensaje("❌ Falta el rol_id");
+      } else {
+        setMensaje(error.response?.data?.error || "❌ Error al registrar usuario. Intenta nuevamente.");
+      }
     }
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={globalStyles.container}>
+      {/* Título grande */}
+      <Text style={globalStyles.title}>Registro de Usuario</Text>
+
+      {/* Campos de entrada */}
       <TextInput
+        ref={nombreRef}
+        style={globalStyles.input}
         placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
+        value={formData.nombre}
+        onChangeText={(value) => handleChange("nombre", value)}
       />
+      {errors.nombre && <Text style={{ color: 'red' }}>❌ {errors.nombre}</Text>}
+
       <TextInput
-        placeholder="Correo"
-        value={correo}
-        onChangeText={setCorreo}
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
+        ref={correoRef}
+        style={globalStyles.input}
+        placeholder="Correo electrónico"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        value={formData.correo}
+        onChangeText={(value) => handleChange("correo", value)}
       />
+      {errors.correo && <Text style={{ color: 'red' }}>❌ {errors.correo}</Text>}
+
       <TextInput
+        ref={contraseñaRef}
+        style={globalStyles.input}
         placeholder="Contraseña"
-        value={contraseña}
-        onChangeText={setContraseña}
         secureTextEntry
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
+        value={formData.contraseña}
+        onChangeText={(value) => handleChange("contraseña", value)}
       />
+      {errors.contraseña && <Text style={{ color: 'red' }}>❌ {errors.contraseña}</Text>}
+
       <TextInput
-        placeholder="Rol ID (ej: 1)"
-        value={rol_id}
-        onChangeText={setRolId}
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
+        ref={confirmRef}
+        style={globalStyles.input}
+        placeholder="Confirmar contraseña"
+        secureTextEntry
+        value={formData.confirmPassword}
+        onChangeText={(value) => handleChange("confirmPassword", value)}
       />
+      {errors.confirmPassword && <Text style={{ color: 'red' }}>❌ {errors.confirmPassword}</Text>}
 
-      <Button title="Registrar" onPress={handleRegister} />
+      {/* Botón de registro */}
+      <TouchableOpacity style={globalStyles.button} onPress={handleRegister}>
+        <Text style={globalStyles.buttonText}>Registrarse</Text>
+      </TouchableOpacity>
 
-      {mensaje ? <Text style={{ marginTop: 15 }}>{mensaje}</Text> : null}
+      {mensaje ? <Text style={{ marginTop: 15, textAlign: 'center' }}>{mensaje}</Text> : null}
 
-      {/* ✅ Botón para volver a Login */}
-      <Button
-        title="Volver a Login"
-        onPress={() => navigation.navigate('Login')}
-      />
+      {/* Botón volver */}
+      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('Login')}>
+        <Text style={globalStyles.buttonText}>Volver a Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }

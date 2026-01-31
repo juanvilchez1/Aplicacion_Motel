@@ -1,54 +1,65 @@
-// frontend/src/screens/LoginScreen.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, TextInput, Text, TouchableOpacity } from 'react-native';
 import { login } from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { globalStyles } from '../styles';
 
 export default function LoginScreen({ navigation }) {
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [mensaje, setMensaje] = useState('');
 
+  const correoRef = useRef(null);
+  const contraseñaRef = useRef(null);
+
   const handleLogin = async () => {
     try {
       const data = await login(correo, contraseña);
-
-      // ✅ Guardar token en AsyncStorage
       await AsyncStorage.setItem('token', data.token);
-
-      setMensaje("Login exitoso, token guardado en el dispositivo");
-
-      // ✅ Redirigir al Dashboard (pantalla protegida)
+      setMensaje("✅ Login exitoso, token guardado en el dispositivo");
       navigation.navigate('Dashboard');
     } catch (error) {
-      setMensaje(error.response?.data?.error || "Error al iniciar sesión");
+      setMensaje(error.response?.data?.error || "❌ Error al iniciar sesión: correo o contraseña incorrectos");
+      correoRef.current.focus();
     }
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={globalStyles.container}>
+      {/* Título grande */}
+      <Text style={globalStyles.title}>Inicio de Sesión</Text>
+
+      {/* Campos de entrada */}
       <TextInput
-        placeholder="Correo"
+        ref={correoRef}
+        style={globalStyles.input}
+        placeholder="Correo electrónico"
+        keyboardType="email-address"
+        autoCapitalize="none"
         value={correo}
         onChangeText={setCorreo}
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
       />
+
       <TextInput
+        ref={contraseñaRef}
+        style={globalStyles.input}
         placeholder="Contraseña"
+        secureTextEntry
         value={contraseña}
         onChangeText={setContraseña}
-        secureTextEntry
-        style={{ marginBottom: 10, borderWidth: 1, padding: 8 }}
       />
-      <Button title="Iniciar sesión" onPress={handleLogin} />
 
-      {mensaje ? <Text style={{ marginTop: 15 }}>{mensaje}</Text> : null}
+      {/* Botón de login */}
+      <TouchableOpacity style={globalStyles.button} onPress={handleLogin}>
+        <Text style={globalStyles.buttonText}>Iniciar sesión</Text>
+      </TouchableOpacity>
 
-      {/* ✅ Botón para ir a la pantalla de registro */}
-      <Button
-        title="Ir a Registro"
-        onPress={() => navigation.navigate('Register')}
-      />
+      {mensaje ? <Text style={{ marginTop: 15, textAlign: 'center' }}>{mensaje}</Text> : null}
+
+      {/* Botón ir a registro */}
+      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('Register')}>
+        <Text style={globalStyles.buttonText}>Ir a Registro</Text>
+      </TouchableOpacity>
     </View>
   );
 }
