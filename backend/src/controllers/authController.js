@@ -29,25 +29,45 @@ exports.register = async (req, res) => {
 // Login
 exports.login = async (req, res) => {
   const { correo, contraseña } = req.body;
+
+  if (!correo || !contraseña) {
+    return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
+  }
+
   try {
     const [rows] = await pool.query('SELECT * FROM usuarios WHERE correo = ?', [correo]);
     if (rows.length === 0) {
-      return res.status(400).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
     const usuario = rows[0];
     const esValido = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!esValido) {
-      return res.status(400).json({ error: 'Credenciales inválidas' });
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const token = jwt.sign(
-      { id: usuario.id, rol_id: usuario.rol_id },
-      process.env.JWT_SECRET,
+    const payload = {
+      id: usuario.id,
+      rol_id: usuario.rol_id,
+      nombre: usuario.nombre,
+      correo: usuario.correo
+    };
+
+    const accessToken = jwt.sign(
+      payload,
+      process.env.JWT_SECRET || 'clave_secreta',
       { expiresIn: '1h' }
     );
 
-    res.json({ mensaje: 'Login exitoso', token });
+    // Generar refreshToken si lo vas a usar
+    // const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET || 'refresh_secreta', { expiresIn: '7d' });
+    res.json({
+      mensaje: 'Login exitoso',
+      usuario: { id: usuario.id, nombre: usuario.nombre, rol_id: usuario.rol_id },
+      token: accessToken
+      // refreshToken
+    });
+
   } catch (error) {
     console.error("Error en login:", error);
     res.status(500).json({ error: "Error al iniciar sesión" });

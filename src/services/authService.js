@@ -2,7 +2,7 @@
 import axios from 'axios';
 import API_URL from '../config/api';
 
-// ✅ Registro de usuario
+// Registro de usuario
 export const register = async (nombre, correo, contraseña, rol_id) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, {
@@ -18,7 +18,7 @@ export const register = async (nombre, correo, contraseña, rol_id) => {
   }
 };
 
-// ✅ Login de usuario
+// Login de usuario
 export const login = async (correo, contraseña) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, {
@@ -32,7 +32,7 @@ export const login = async (correo, contraseña) => {
   }
 };
 
-// ✅ Validación asíncrona: verificar si el correo ya existe
+// Validación asíncrona: verificar si el correo ya existe
 export const checkEmailExists = async (correo) => {
   try {
     const response = await axios.post(`${API_URL}/auth/check-email`, { correo });

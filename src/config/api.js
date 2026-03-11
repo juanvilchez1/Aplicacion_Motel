@@ -1,6 +1,4 @@
 // frontend/src/config/api.js
-
-// Para emulador Android Studio
-const API_URL = "http://10.0.2.2:3000/api";
+const API_URL = "http://192.168.0.3:3000/api";
 
 export default API_URL;

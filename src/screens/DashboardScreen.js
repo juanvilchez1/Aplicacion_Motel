@@ -2,16 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../styles';
+import API_URL from "../config/api";
 
 export default function DashboardScreen({ navigation }) {
   const [token, setToken] = useState('');
+  const [backendData, setBackendData] = useState(null);
 
   useEffect(() => {
-    const getToken = async () => {
+    const verificarSesion = async () => {
       const savedToken = await AsyncStorage.getItem('token');
-      setToken(savedToken || '');
+
+      if (!savedToken) {
+        navigation.replace('Login'); // redirige si no hay token
+      } else {
+        setToken(savedToken); // guarda el token en estado
+
+        try {
+          const response = await fetch(`${API_URL}/test-db`, {
+            headers: { Authorization: `Bearer ${savedToken}` }
+          });
+          const data = await response.json();
+          console.log("Respuesta del backend:", data);
+          setBackendData(data); // guarda la respuesta para mostrarla en pantalla
+        } catch (error) {
+          console.error("Error al conectar con backend:", error);
+        }
+      }
     };
-    getToken();
+
+    verificarSesion();
   }, []);
 
   const handleLogout = async () => {
@@ -30,6 +49,16 @@ export default function DashboardScreen({ navigation }) {
       ) : (
         <Text style={{ color: 'red', marginBottom: 20 }}>
           ❌ No hay token guardado
+        </Text>
+      )}
+
+      {backendData ? (
+        <Text style={{ color: '#000080', marginBottom: 20 }}>
+          🔗 Respuesta del servidor: {JSON.stringify(backendData)}
+        </Text>
+      ) : (
+        <Text style={{ color: 'gray', marginBottom: 20 }}>
+          Esperando respuesta del servidor...
         </Text>
       )}
 

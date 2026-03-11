@@ -17,9 +17,13 @@ export default function LoginScreen({ navigation }) {
       const data = await login(correo, contraseña);
       await AsyncStorage.setItem('token', data.token);
       setMensaje("✅ Login exitoso, token guardado en el dispositivo");
-      navigation.navigate('Dashboard');
+      navigation.replace('OnboardingUserLogin'); // redirige al onboarding de bienvenida
+
     } catch (error) {
-      setMensaje(error.response?.data?.error || "❌ Error al iniciar sesión: correo o contraseña incorrectos");
+      setMensaje(
+        error.response?.data?.error ||
+        "❌ Error al iniciar sesión: correo o contraseña incorrectos"
+      );
       correoRef.current.focus();
     }
   };
@@ -54,10 +58,15 @@ export default function LoginScreen({ navigation }) {
         <Text style={globalStyles.buttonText}>Iniciar sesión</Text>
       </TouchableOpacity>
 
-      {mensaje ? <Text style={{ marginTop: 15, textAlign: 'center' }}>{mensaje}</Text> : null}
+      {mensaje ? (
+        <Text style={{ marginTop: 15, textAlign: 'center' }}>{mensaje}</Text>
+      ) : null}
 
       {/* Botón ir a registro */}
-      <TouchableOpacity style={globalStyles.button} onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity
+        style={globalStyles.button}
+        onPress={() => navigation.navigate('Register')}
+      >
         <Text style={globalStyles.buttonText}>Ir a Registro</Text>
       </TouchableOpacity>
     </View>
