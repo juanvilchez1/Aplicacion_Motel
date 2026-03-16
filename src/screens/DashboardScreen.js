@@ -62,6 +62,23 @@ export default function DashboardScreen({ navigation }) {
         </Text>
       )}
 
+      {/* Botón para probar la cámara */}
+      <TouchableOpacity
+        style={globalStyles.button}
+        onPress={() => navigation.navigate('Camera')}
+      >
+        <Text style={globalStyles.buttonText}>Probar Cámara</Text>
+      </TouchableOpacity>
+
+      {/* Botón para probar la ubicación */}
+      <TouchableOpacity
+        style={globalStyles.button}
+        onPress={() => navigation.navigate('Location')}
+      >
+        <Text style={globalStyles.buttonText}>Probar Ubicación</Text>
+      </TouchableOpacity>
+
+      {/* Botón para cerrar sesión */}
       <TouchableOpacity style={globalStyles.button} onPress={handleLogout}>
         <Text style={globalStyles.buttonText}>Cerrar sesión</Text>
       </TouchableOpacity>

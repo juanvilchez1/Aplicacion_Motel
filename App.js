@@ -12,6 +12,10 @@ import OnboardingBenefits from './src/screens/Onboarding/OnboardingBenefits';
 import OnboardingPermissions from './src/screens/Onboarding/OnboardingPermissions';
 import OnboardingUserLogin from './src/screens/Onboarding/OnboardingUserLogin';
 
+// importa las nuevas pantallas funcionales
+import CameraScreen from './src/screens/CameraScreen';
+import LocationScreen from './src/screens/LocationScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -46,20 +50,31 @@ export default function App() {
           component={RegisterScreen}
           options={{ title: 'Registro de Usuario' }}
         />
-
         <Stack.Screen
           name="OnboardingUserLogin"
           component={OnboardingUserLogin}
           options={{ title: 'Bienvenida Usuario' }}
         />
 
+        {/* Flujo principal */}
         <Stack.Screen
           name="Dashboard"
           component={DashboardScreen}
           options={{ title: 'Panel Privado' }}
         />
+
+        {/* Funcionalidades nativas */}
+        <Stack.Screen
+          name="Camera"
+          component={CameraScreen}
+          options={{ title: 'Cámara' }}
+        />
+        <Stack.Screen
+          name="Location"
+          component={LocationScreen}
+          options={{ title: 'Ubicación' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
