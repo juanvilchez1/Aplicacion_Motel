@@ -15,6 +15,11 @@ import OnboardingUserLogin from './src/screens/Onboarding/OnboardingUserLogin';
 // importa las nuevas pantallas funcionales
 import CameraScreen from './src/screens/CameraScreen';
 import LocationScreen from './src/screens/LocationScreen';
+import RoomListScreen from './src/screens/Reservations/RoomListScreen';
+import ReservationFormScreen from './src/screens/Reservations/ReservationFormScreen';
+import ReservationConfirmationScreen from './src/screens/Reservations/ReservationConfirmationScreen';
+import MyReservationsScreen from './src/screens/Reservations/MyReservationsScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -63,18 +68,41 @@ export default function App() {
           options={{ title: 'Panel Privado' }}
         />
 
-        {/* Funcionalidades nativas */}
-        <Stack.Screen
-          name="Camera"
-          component={CameraScreen}
-          options={{ title: 'Cámara' }}
-        />
-        <Stack.Screen
-          name="Location"
-          component={LocationScreen}
-          options={{ title: 'Ubicación' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+       {/* Funcionalidades nativas */}
+<Stack.Screen
+  name="Camera"
+  component={CameraScreen}
+  options={{ title: 'Cámara' }}
+/>
+<Stack.Screen
+  name="Location"
+  component={LocationScreen}
+  options={{ title: 'Ubicación' }}
+/>
+
+{/* Funcionalidades de reservas */}
+<Stack.Screen
+  name="RoomList"
+  component={RoomListScreen}
+  options={{ title: 'Habitaciones disponibles' }}
+/>
+<Stack.Screen
+  name="ReservationForm"
+  component={ReservationFormScreen}
+  options={{ title: 'Formulario de Reserva' }}
+/>
+<Stack.Screen
+  name="ReservationConfirmation"
+  component={ReservationConfirmationScreen}
+  options={{ title: 'Confirmación de Reserva' }}
+/>
+<Stack.Screen
+  name="MyReservations"
+  component={MyReservationsScreen}
+  options={{ title: 'Mis Reservas' }}
+/>
+</Stack.Navigator>
+</NavigationContainer>
+);
 }
+

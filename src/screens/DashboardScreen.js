@@ -78,6 +78,22 @@ export default function DashboardScreen({ navigation }) {
         <Text style={globalStyles.buttonText}>Probar Ubicación</Text>
       </TouchableOpacity>
 
+      {/* Botón para ver habitaciones disponibles */}
+      <TouchableOpacity
+        style={globalStyles.button}
+        onPress={() => navigation.navigate('RoomList')}
+      >
+        <Text style={globalStyles.buttonText}>📋 Habitaciones</Text>
+      </TouchableOpacity>
+
+      {/* Botón para ver mis reservas */}
+      <TouchableOpacity
+        style={globalStyles.button}
+        onPress={() => navigation.navigate('MyReservations')}
+      >
+        <Text style={globalStyles.buttonText}>📂 Mis Reservas</Text>
+      </TouchableOpacity>
+
       {/* Botón para cerrar sesión */}
       <TouchableOpacity style={globalStyles.button} onPress={handleLogout}>
         <Text style={globalStyles.buttonText}>Cerrar sesión</Text>
